@@ -1,160 +1,189 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlayHub - 게임 공유 플랫폼</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background-color: #0f172a; color: #f8fafc; font-family: sans-serif; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PlayHub - 게임 공유 플랫폼</title>
+<style>
+:root{
+  --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0; --text:#0f172a; --muted:#64748b;
+  --accent:#4f46e5; --accent-h:#4338ca; --input:#f8fafc; --warn-bg:#fef3c7; --warn-line:#fcd34d; --warn-text:#92400e;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f172a; --card:#1e293b; --line:#334155; --text:#f8fafc; --muted:#94a3b8;
+    --accent:#6366f1; --accent-h:#818cf8; --input:#0f172a; --warn-bg:#3a2e0b; --warn-line:#78591a; --warn-text:#fcd34d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f172a; --card:#1e293b; --line:#334155; --text:#f8fafc; --muted:#94a3b8;
+  --accent:#6366f1; --accent-h:#818cf8; --input:#0f172a; --warn-bg:#3a2e0b; --warn-line:#78591a; --warn-text:#fcd34d;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 120px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.logo{display:flex;align-items:center;gap:8px;font-size:28px;font-weight:800;color:var(--accent)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;font-weight:700;font-size:15px;padding:12px 20px;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--accent-h)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.toolbar input,.toolbar select{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.toolbar input{flex:1;min-width:160px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);font-weight:600}
+.card h3{margin:10px 0 6px;font-size:18px;word-break:break-word}
+.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5;word-break:break-word}
+.row{display:flex;gap:8px}
+.play{flex:1;text-align:center;text-decoration:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;padding:10px;border-radius:8px}
+.play:hover{background:var(--accent-h)}
+.del{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;font-size:13px}
+.empty{grid-column:1/-1;text-align:center;padding:60px 16px;border:2px dashed var(--line);border-radius:14px;color:var(--muted)}
+.empty .btn{margin-top:14px}
+.fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:40;border-radius:999px;padding:16px 24px;font-size:16px;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative}
+.modal h2{margin:0 0 14px;font-size:20px}
+.close{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-text);border-radius:10px;padding:12px;font-size:13px;margin-bottom:14px;line-height:1.5}
+label.f{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+.modal input[type=text],.modal input[type=url],.modal select,.modal textarea{width:100%;background:var(--input);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-family:inherit}
+.modal textarea{height:80px;resize:vertical}
+.agree{display:flex;gap:8px;align-items:flex-start;margin:14px 0 4px;font-size:13px}
+.agree input{margin-top:3px}
+.submit{width:100%;margin-top:12px}
+.err{color:#ef4444;font-size:13px;margin-top:8px;min-height:18px}
+</style>
 </head>
-<body class="p-6 min-h-screen">
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span>🎮</span>PlayHub</div>
+    <button class="btn" onclick="openModal()">+ 게임 업로드</button>
+  </header>
 
-  <!-- 메인 헤더 -->
-  <div class="max-w-6xl mx-auto flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
-    <div class="flex items-center gap-2">
-      <span class="text-3xl">🎮</span>
-      <h1 class="text-3xl font-bold text-indigo-400">PlayHub</h1>
-    </div>
-    <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg shadow flex items-center gap-2">
-      <span>+</span> 게임 업로드
-    </button>
+  <div class="toolbar">
+    <input id="q" type="search" placeholder="게임 검색..." oninput="render()">
+    <select id="filter" onchange="render()">
+      <option value="">전체 카테고리</option>
+      <option>Arcade</option><option>Puzzle</option><option>Action</option><option>Indie</option>
+    </select>
   </div>
 
-  <!-- 게임 목록 영역 -->
-  <div class="max-w-6xl mx-auto">
-    <h2 class="text-xl font-bold mb-4 text-slate-300">등록된 게임 목록</h2>
-    <div id="gameGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- 동적으로 추가되는 게임 카드가 여기에 위치합니다 -->
-    </div>
-  </div>
+  <div id="grid" class="grid"></div>
+</div>
 
-  <!-- 업로드 모달 -->
-  <div id="uploadModal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
-      
-      <h2 class="text-xl font-bold mb-4 text-white">신규 게임 등록</h2>
-      
-      <!-- ⚠️ 저작권 경고 박스 -->
-      <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-4 text-amber-200 text-sm">
-        <div class="font-bold mb-1 flex items-center gap-2 text-amber-400">
-          <span>⚠️</span> 저작권 및 상표권 준수 안내
-        </div>
-        <ul class="list-disc list-inside space-y-1 text-amber-300/80 text-xs">
-          <li>타인의 상표권(Pac-Man, Tetris 등)이나 저작권 에셋 무단 도용 금지</li>
-          <li>본인이 직접 개발했거나, 허가된 오픈소스 게임 URL만 등록 가능</li>
-        </ul>
+<button class="btn fab" onclick="openModal()">+ 게임 업로드</button>
+
+<div id="overlay" class="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="close" onclick="closeModal()" aria-label="닫기">✕</button>
+    <h2>신규 게임 등록</h2>
+    <div class="warn"><b>⚠️ 저작권 및 상표권 준수 안내</b><br>타인의 상표권이나 저작권 에셋을 무단으로 사용한 게임은 등록할 수 없습니다. 직접 개발했거나 사용이 허가된 게임의 URL만 등록해 주세요.</div>
+    <form id="form" onsubmit="submitGame(event)">
+      <label class="f" for="title">게임 제목</label>
+      <input id="title" type="text" maxlength="60" placeholder="예: Pixel Escape" required>
+      <label class="f" for="url">게임 URL</label>
+      <input id="url" type="url" placeholder="https://..." required>
+      <label class="f" for="cat">카테고리</label>
+      <select id="cat"><option>Arcade</option><option>Puzzle</option><option>Action</option><option>Indie</option></select>
+      <label class="f" for="desc">게임 설명</label>
+      <textarea id="desc" maxlength="300" placeholder="게임에 대한 간단한 설명..."></textarea>
+      <div class="agree">
+        <input id="agree" type="checkbox" required>
+        <label for="agree">본인이 직접 개발했거나 오픈소스 또는 허가를 받은 게임임을 확인합니다. (필수)</label>
       </div>
-
-      <!-- 입력 폼 -->
-      <form id="gameForm" onsubmit="handleUpload(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">게임 제목</label>
-          <input type="text" id="title" placeholder="예: Pixel Escape" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">게임 URL (Link)</label>
-          <input type="url" id="url" placeholder="https://..." required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">카테고리</label>
-          <select id="category" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-            <option value="Arcade">Arcade</option>
-            <option value="Puzzle">Puzzle</option>
-            <option value="Action">Action</option>
-            <option value="Indie">Indie</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-400 mb-1">게임 설명</label>
-          <textarea id="description" placeholder="게임에 대한 간단한 설명..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-indigo-500 h-20"></textarea>
-        </div>
-
-        <!-- 저작권 동의 체크박스 -->
-        <div class="flex items-start gap-2 pt-2">
-          <input type="checkbox" id="agree" required class="mt-1 accent-indigo-500 cursor-pointer">
-          <label for="agree" class="text-xs text-slate-300 cursor-pointer">
-            본인이 직접 개발했거나, 오픈소스/허가를 받은 게임임을 확인합니다. (필수)
-          </label>
-        </div>
-
-        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg mt-4 transition">
-          등록하기
-        </button>
-      </form>
-    </div>
+      <div id="err" class="err"></div>
+      <button class="btn submit" type="submit">등록하기</button>
+    </form>
   </div>
+</div>
 
-  <script>
-    // 기본 샘플 데이터 완전 삭제 (비어 있는 배열로 시작)
-    let games = [];
+<script>
+var KEY = 'playhub-games';
+var games = [];
+try { games = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { games = []; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(games)); } catch (e) {} }
 
-    // 화면에 게임 카드 렌더링 함수
-    function renderGames() {
-      const grid = document.getElementById('gameGrid');
-      grid.innerHTML = '';
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
 
-      if (games.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-16 border border-dashed border-slate-800 rounded-xl">
-            <p class="text-slate-500 text-sm mb-3">등록된 게임이 없습니다.</p>
-            <button onclick="openModal()" class="text-xs text-indigo-400 hover:underline">첫 번째 게임을 직접 등록해 보세요!</button>
-          </div>
-        `;
-        return;
+function render() {
+  var grid = document.getElementById('grid');
+  var q = document.getElementById('q').value.trim().toLowerCase();
+  var f = document.getElementById('filter').value;
+  grid.textContent = '';
+  var list = games.filter(function (g) {
+    return (!f || g.category === f) && (!q || (g.title + ' ' + g.description).toLowerCase().indexOf(q) > -1);
+  });
+  if (!list.length) {
+    var e = el('div', 'empty');
+    e.appendChild(el('div', '', games.length ? '검색 결과가 없습니다.' : '등록된 게임이 없습니다.'));
+    if (!games.length) {
+      var b = el('button', 'btn', '+ 첫 번째 게임 등록하기');
+      b.onclick = openModal;
+      e.appendChild(b);
+    }
+    grid.appendChild(e);
+    return;
+  }
+  list.forEach(function (g) {
+    var c = el('div', 'card');
+    var top = el('div');
+    top.appendChild(el('span', 'tag', g.category));
+    top.appendChild(el('h3', '', g.title));
+    top.appendChild(el('p', '', g.description || '설명이 없습니다.'));
+    var row = el('div', 'row');
+    var a = el('a', 'play', '게임 플레이 ↗');
+    a.href = g.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    var d = el('button', 'del', '삭제');
+    d.onclick = function () {
+      if (confirm('이 게임을 삭제할까요?')) {
+        games = games.filter(function (x) { return x.id !== g.id; });
+        save(); render();
       }
+    };
+    row.appendChild(a); row.appendChild(d);
+    c.appendChild(top); c.appendChild(row);
+    grid.appendChild(c);
+  });
+}
 
-      games.forEach(game => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-lg flex flex-col justify-between hover:border-slate-600 transition";
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-medium">${game.category}</span>
-            </div>
-            <h3 class="text-lg font-bold text-white mb-2">${game.title}</h3>
-            <p class="text-sm text-slate-400 mb-4 line-clamp-2">${game.description || '설명이 없습니다.'}</p>
-          </div>
-          <a href="${game.url}" target="_blank" rel="noopener noreferrer" class="w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold py-2 rounded-lg transition inline-block">
-            게임 플레이 ↗
-          </a>
-        `;
-        grid.appendChild(card);
-      });
-    }
+function openModal() { document.getElementById('overlay').classList.add('open'); }
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('form').reset();
+  document.getElementById('err').textContent = '';
+}
 
-    // 모달 열기/닫기
-    function openModal() {
-      document.getElementById('uploadModal').classList.remove('hidden');
-    }
+function submitGame(ev) {
+  ev.preventDefault();
+  var url = document.getElementById('url').value.trim();
+  if (!/^https?:\/\//i.test(url)) {
+    document.getElementById('err').textContent = 'http:// 또는 https:// 로 시작하는 URL만 등록할 수 있어요.';
+    return;
+  }
+  games.unshift({
+    id: Date.now(),
+    title: document.getElementById('title').value.trim(),
+    url: url,
+    category: document.getElementById('cat').value,
+    description: document.getElementById('desc').value.trim()
+  });
+  save(); render(); closeModal();
+}
 
-    function closeModal() {
-      document.getElementById('uploadModal').classList.add('hidden');
-      document.getElementById('gameForm').reset();
-    }
-
-    // 신규 게임 등록 처리
-    function handleUpload(event) {
-      event.preventDefault();
-
-      const newGame = {
-        id: Date.now(),
-        title: document.getElementById('title').value,
-        url: document.getElementById('url').value,
-        category: document.getElementById('category').value,
-        description: document.getElementById('description').value
-      };
-
-      games.unshift(newGame);
-      renderGames();
-      closeModal();
-      alert('게임을 성공적으로 업로드했습니다!');
-    }
-
-    renderGames();
-  </script>
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+render();
+</script>
 </body>
 </html>
 
